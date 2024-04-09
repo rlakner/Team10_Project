@@ -1,0 +1,13 @@
+Since the scrape_images function cannot be automatically tested, here is a 
+testing procedure to determine if it is successful.
+
+- Perform the procedure outlined in scrape_items_testing.text to obtain the
+    list of items used in the scrape_images function 
+- Open the Python script that has the DepopScraper class and call the 
+    scrape_images function with the returned items list as an argument
+- Verify that the function returns a list of dictionaries with the direct link
+    to items as the key and an image source link as the value
+- For each item in the list:
+    - Open the image source link (the value assigned to the key)
+    - Compare the image with the actual image displayed on the Depop website
+    for that item
