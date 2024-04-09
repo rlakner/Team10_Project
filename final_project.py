@@ -11,8 +11,8 @@ def scrape_items(search):
     
     Returns: 
         items(list): a list of dictionaries of the items found with the key as 
-        the name of the item and three values being its price, condition, and
-        unique direct link 
+        the name of the item and the value being a tuple containaint its price, 
+        condition, and unique direct link 
     """
     
 def scrape_images(items):
@@ -34,33 +34,30 @@ def group_by_condition(items):
     
     Args:
         items(list): a list of dictionaries of the items found with the key as 
-        the name of the item and three values being its price, condition, and
-        unique direct link 
+        the name of the item and the value being a tuple containaint its price, 
+        condition, and unique direct link  
     
     Returns:
         new_items(list): a list of dictionaries that represent items that 
             are either listed as 'New' or 'Like New' with the key as 
-            the name of the item and three values being its price, condition, 
-            and unique direct link 
+            the name of the item and the value being a tuple containaint its 
+            price, condition, and unique direct link
         used_items(list): a list of dictionaries that represent items that 
             are either listed as any variation of 'Used' with the key as 
-            the name of the item and three values being its price, condition, 
-            and unique direct link 
+            the name of the item and the value being a tuple containaint its 
+            price, condition, and unique direct link
     """
 
-def averages(new_items, used_items):
+def averages(new_items_prices, used_items_prices):
     """Calculates the average price of an item on Depop in different conditions
     
     Args:
-        new_items(list): a list of dictionaries that represent items that 
-            are either listed as 'New' or 'Like New' with the key as 
-            the name of the item and three values being its price, condition, 
-            and unique direct link 
-        used_items(list): a list of dictionaries that represent items that 
-            are either listed as any variation of 'Used' with the key as 
-            the name of the item and three values being its price, condition, 
-            and unique direct link 
-
+         new_items_prices(list): a list of floats the represent the price of 
+            items that result from a search that are either listed as 'New' or 
+            'Like New' 
+        used_items(list): a list of floats the represent the price of 
+            items that result from a search that are listed as any variation of 
+            'Used'
     Returns:
         item_averages(tuple): a tuple containing the calculated average price 
             for the item in new condition, used condition, and for all listed 
@@ -97,8 +94,8 @@ def sort_by_price(items, ascending):
     
     Args:
         items(list): a list of dictionaries of the items found with the key as 
-        the name of the item and three values being its price, condition, and
-        unique direct link 
+        the name of the item and the value being a tuple containaint its price, 
+        condition, and unique direct link  
         ascending(boolean): the desired search condition where True sorts items 
             in ascending order and False sorts items in descending order
     
@@ -114,12 +111,12 @@ def best_match(new_items, used_items, new_price, used_price, avg_price):
     Args:
         new_items(list): a list of dictionaries that represent items that 
             are either listed as 'New' or 'Like New' with the key as 
-            the name of the item and three values being its price, condition, 
-            and unique direct link 
+            the name of the item and the value being a tuple containaint its 
+            price, condition, and unique direct link
         used_items(list): a list of dictionaries that represent items that 
             are either listed as any variation of 'Used' with the key as 
-            the name of the item and three values being its price, condition, 
-            and unique direct link 
+            the name of the item and the value being a tuple containaint its 
+            price, condition, and unique direct link
         new_price(float): the average price of the items in new or like new
             condition
         used_price(float): the average price of the items in used condition
