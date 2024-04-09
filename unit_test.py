@@ -1,11 +1,11 @@
 import pytest
-from final_project import scrape, averages, get_min_price, get_max_price, sort_by_price, group_by_condition, best_match
+from final_project import scrape_items, averages, get_min_price, get_max_price, sort_by_price, group_by_condition, best_match
 
 def test_scrape_items():
     """A test case to check that the scrape_items function returns a list
     """
     search = "carhartt jacket"
-    result = scrape(search)
+    result = scrape_items(search)
     assert isinstance(result, list)
      
 def test_group_by_condition():
@@ -57,7 +57,7 @@ def test_get_max_price():
     """A test case to check that the get_max_price function returns the price
     """
     prices = [10.00, 50.00, 20.00, 35.50, 15.00, 20.00]
-    result = get_min_price(prices)
+    result = get_max_price(prices)
     assert isinstance(result, float)
     assert result == 50.00
 
