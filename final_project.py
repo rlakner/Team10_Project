@@ -1,25 +1,55 @@
 from bs4 import BeautifulSoup
 import requests
 
-def scrape(url, discount_percent):
-    """Uses BeautifulSoup to scrape the the data from the entered Depop URL
+def scrape_items(search):
+    """Uses BeautifulSoup to scrape the data from the entered Depop URL
     to find items being sold at a discounted price.
     
     Args:
-    url(string): Link of the Depop page passed through by the user
+    search(string): The item a user is searching for which will be used to add
+        to the Depop base URL 
     
-    discount_percent(float): The minimum deal percentage that the user is
-    searching for
+    Returns: 
+        items(list): a list of dictionaries of the items found with the key as 
+        the name of the item and three values being its price, condition, and
+        unique direct link 
+    """
     
-    Returns: Returns a dictionary of the items with the key as the name of the
-    item and two values being the link of the item and the discount percentage
+def scrape_images(items):
+    """Uses BeautifulSoup to scrape the images of the items associated with the 
+    gathered unique direct links from scrape_items.
+    
+    Args:
+    items(list): The list of dictionaries returned by scrape_items which will
+        then be parsed to extract the unique direct links
+    
+    Returns: 
+        images(list): A list of dictionaries of the item images to be displayed
+            in the user interface, having the links as keys and the image
+            source links
     """
 
-def averages(prices):
+def group_by_condition(items):
+    """"Groups items into either New or Used 
+    
+    Args:
+        items(list): a list of dictionaries that represent items from a search
+    
+    Returns:
+        new_items(list): a list of dictionaries that represent items that 
+            are either listed as 'New' or 'Like New'
+        used_items(list): a list of dictionaries that represent items that 
+            are either listed as any variation of 'Used'
+    """
+
+def averages(new_items, used_items):
     """Calculates the average price of an item on Depop in different conditions
     
     Args:
-        prices(list): a list of floats the represent the price of listed items
+        new_items(list): a list of dictionaries that represent items that 
+            are either listed as 'New' or 'Like New'
+        used_items(list): a list of dictionaries that represent items that 
+            are either listed as any variation of 'Used'
 
     Returns:
         item_averages(tuple): a tuple containing the calculated average price 
@@ -66,18 +96,6 @@ def sort_by_price(items, ascending):
     """
     pass
 
-def group_by_condition(items):
-    """"Groups items into either New or Used 
-    
-    Args:
-        items(list): a list of dictionaries that represent items from a search
-    
-    Returns:
-        new_items(list): a list of dictionaries that represent items that 
-            are either listed as 'New' or 'Like New'
-        used_items(list): a list of dictionaries that represent items that 
-            are either listed as any variation of 'Used'
-    """
 
 def best_match(new_items, used_items, new_price, used_price, avg_price):
     """Sorts items from a search by how good of a deal they are
