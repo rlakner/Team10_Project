@@ -116,7 +116,7 @@ class DepopScraper:
             items in ascending order and False sorts items in descending order
 
         Returns:
-            sorted_items(list): a list of dictionaries sorted in the desired order
+            sorted_items(list): a list of Items sorted in the desired order
         """
         pass
     
