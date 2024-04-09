@@ -1,8 +1,8 @@
 from bs4 import BeautifulSoup
 import requests
 
-def scrape(search):
-    """Uses BeautifulSoup to scrape the the data from the entered Depop URL
+def scrape_items(search):
+    """Uses BeautifulSoup to scrape the data from the entered Depop URL
     to find items being sold at a discounted price.
     
     Args:
@@ -13,6 +13,20 @@ def scrape(search):
         items(list): a list of dictionaries of the items found with the key as 
         the name of the item and three values being its price, condition, and
         unique direct link 
+    """
+    
+def scrape_images(items):
+    """Uses BeautifulSoup to scrape the images of the items associated with the 
+    gathered unique direct links from scrape_items.
+    
+    Args:
+    items(list): The list of dictionaries returned by scrape_items which will
+        then be parsed to extract the unique direct links
+    
+    Returns: 
+        images(list): A list of dictionaries of the item images to be displayed
+            in the user interface, having the links as keys and the image
+            source links
     """
 
 def group_by_condition(items):
