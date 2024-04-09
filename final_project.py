@@ -33,13 +33,19 @@ def group_by_condition(items):
     """"Groups items into either New or Used 
     
     Args:
-        items(list): a list of dictionaries that represent items from a search
+        items(list): a list of dictionaries of the items found with the key as 
+        the name of the item and three values being its price, condition, and
+        unique direct link 
     
     Returns:
         new_items(list): a list of dictionaries that represent items that 
-            are either listed as 'New' or 'Like New'
+            are either listed as 'New' or 'Like New' with the key as 
+            the name of the item and three values being its price, condition, 
+            and unique direct link 
         used_items(list): a list of dictionaries that represent items that 
-            are either listed as any variation of 'Used'
+            are either listed as any variation of 'Used' with the key as 
+            the name of the item and three values being its price, condition, 
+            and unique direct link 
     """
 
 def averages(new_items, used_items):
@@ -47,15 +53,18 @@ def averages(new_items, used_items):
     
     Args:
         new_items(list): a list of dictionaries that represent items that 
-            are either listed as 'New' or 'Like New'
+            are either listed as 'New' or 'Like New' with the key as 
+            the name of the item and three values being its price, condition, 
+            and unique direct link 
         used_items(list): a list of dictionaries that represent items that 
-            are either listed as any variation of 'Used'
+            are either listed as any variation of 'Used' with the key as 
+            the name of the item and three values being its price, condition, 
+            and unique direct link 
 
     Returns:
         item_averages(tuple): a tuple containing the calculated average price 
-            for the item in brand new condition, non-new
-            condition, and for all listed items from a search, regardless
-            of condition
+            for the item in new condition, used condition, and for all listed 
+            items from a search, regardless of condition
     """
     pass
 
@@ -87,7 +96,9 @@ def sort_by_price(items, ascending):
     """"Sorts items from a search either in ascending or descending order
     
     Args:
-        items(list): a list of dictionaries that represent items from a search
+        items(list): a list of dictionaries of the items found with the key as 
+        the name of the item and three values being its price, condition, and
+        unique direct link 
         ascending(boolean): the desired search condition where True sorts items 
             in ascending order and False sorts items in descending order
     
@@ -102,14 +113,19 @@ def best_match(new_items, used_items, new_price, used_price, avg_price):
 
     Args:
         new_items(list): a list of dictionaries that represent items that 
-            are either listed as 'New' or 'Like New'
+            are either listed as 'New' or 'Like New' with the key as 
+            the name of the item and three values being its price, condition, 
+            and unique direct link 
         used_items(list): a list of dictionaries that represent items that 
-            are either listed as any variation of 'Used'
-        new_price(float): the average price of the item in new or like new
+            are either listed as any variation of 'Used' with the key as 
+            the name of the item and three values being its price, condition, 
+            and unique direct link 
+        new_price(float): the average price of the items in new or like new
             condition
-        used_price(float): the average price of the item in used condition
+        used_price(float): the average price of the items in used condition
         avg_price(float): the average price of all listed items from a search, 
-            regardlessof condition
+            regardless of condition
+    
     Retruns:
         deals(list): a list of dictionaries that is ordered from best to worst
             deal for the item a user is searching for
