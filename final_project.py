@@ -1,18 +1,18 @@
 from bs4 import BeautifulSoup
 import requests
 
-def scrape(url, discount_percent):
+def scrape(search):
     """Uses BeautifulSoup to scrape the the data from the entered Depop URL
     to find items being sold at a discounted price.
     
     Args:
-    url(string): Link of the Depop page passed through by the user
+    search(string): The item a user is searching for which will be used to add
+        to the Depop base URL 
     
-    discount_percent(float): The minimum deal percentage that the user is
-    searching for
-    
-    Returns: Returns a dictionary of the items with the key as the name of the
-    item and two values being the link of the item and the discount percentage
+    Returns: 
+        items(list): a list of dictionaries of the items found with the key as 
+        the name of the item and three values being its price, condition, and
+        unique direct link 
     """
 
 def group_by_condition(items):
