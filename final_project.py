@@ -123,7 +123,7 @@ def best_match(new_items, used_items, new_price, used_price, avg_price):
         avg_price(float): the average price of all listed items from a search, 
             regardless of condition
     
-    Retruns:
+    Returns:
         deals(list): a list of dictionaries that is ordered from best to worst
             deal for the item a user is searching for
     """
