@@ -1,5 +1,8 @@
-from bs4 import BeautifulSoup
-import requests
+from bs4 import BeautifulSoup as bs
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+import time
 
 class Item:
     """A class for data representing an item listed on Depop
@@ -48,7 +51,49 @@ class DepopScraper:
         Raises:
             NoItemsFound: If no items are found from the search
         """
-        pass
+        url = f'https://www.depop.com/search/?q={search}'
+
+        service = Service(executable_path="chromedriver.exe")
+        driver = webdriver.Chrome(service=service)
+
+        driver.get(url)
+
+        x = 0
+        while True:
+            x += 1
+            driver.execute_script('scrollBy(0,50)')
+            if x > 500: #Change this to make it scroll for longer
+                break
+    
+        source = driver.page_source
+        soup = bs(source, "html.parser")
+        listings = soup.find('ul', class_='styles__ProductListGrid-sc-4aad5806-1 hGGFgp')
+
+        items_list = []
+        complete_list = []
+
+        for listing in listings:
+            price_div = listing.find('div', class_='Price-styles__PriceWithDiscountWrapper-sc-f7c1dfcc-2')
+            if price_div:
+                disc_price = price_div.find('p', class_='sc-eDnWTT Price-styles__DiscountPrice-sc-f7c1dfcc-1 fRxqiS KMEBr').text
+                link = f"http://depop.com{listing.find('a', class_='styles__ProductCard-sc-4aad5806-4 ffvUlI')['href']}"
+            
+        items_list.append([disc_price, link])   
+
+        for item in items_list:
+            driver.get(item[1])
+            item_source = driver.page_source
+            item_soup = bs(item_source, "html.parser")  
+            info_div = item_soup.find('div', class_='_app__FocusWrapper-sc-ed3f3631-0 erUfoA')
+            name = info_div.find('h1', class_='sc-grYavY styles__MobileProductTitle-sc-569ef83f-9 HXICV cTNEru').text
+            p = info_div.find_all('p', class_='sc-eDnWTT ProductAttributes-styles__Attribute-sc-303d66c3-0 kcKICQ iIJjeL')
+            condition = p[1].text
+    
+            complete_list.append({name:(item[0], condition, item[1],)})
+
+        time.sleep(10)
+        driver.quit()
+        return complete_list
     
     def scrape_images(items):
         """Uses BeautifulSoup to scrape the images of the items associated with 
@@ -63,7 +108,22 @@ class DepopScraper:
             displayed in the user interface, having the direct links as keys and 
             the image source links as values
         """
-        pass
+        images = []
+        service = Service(executable_path="chromedriver.exe")
+        driver = webdriver.Chrome(service=service)
+        
+        for item in items:
+            driver.get(item[2])
+            item_source = driver.page_source
+            item_soup = bs(item_source, "html.parser")
+            info_div = item_soup.find('div', class_='styles__Layout-sc-569ef83f-2 MYFCM')
+            img = info_div.find('img')['src']
+            name = info_div.find('img')['alt']
+            
+            images.append({img: name})
+            
+        return images
+        
     
     def averages(items):
         """Calculates the average price of an item in different conditions
@@ -175,3 +235,8 @@ class DepopScraper:
         """
         sorted_items = sorted(items, key=lambda x: x['price'], reverse=not ascending)
         return sorted_items
+    
+if __name__ == "__main__":
+    search = input("Enter search: ")
+    if " " in search:
+        search.replace(" ","+")
