@@ -7,8 +7,11 @@ def multiply(x):
 def greet():
     return "Good morning Team 10"
 
+def leave():
+    return "Goodbye Team 10"
+
 if __name__ == "__main__":
     math()
     multiply()
     greet()
-    
+    leave()
