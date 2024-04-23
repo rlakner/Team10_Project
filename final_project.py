@@ -53,7 +53,7 @@ class DepopScraper:
         """
         url = f'https://www.depop.com/search/?q={search}'
 
-        service = Service(executable_path="chromedriver.exe")
+        service = Service(executable_path="chromedriver.exe") #Change to your path
         driver = webdriver.Chrome(service=service)
 
         driver.get(url)
