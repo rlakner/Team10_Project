@@ -79,6 +79,24 @@ class DepopScraper:
         """
         pass
     
+    def score_price(price, avg):
+        """Scores the price of an item
+        
+        Args:
+            price(float): the price of an item 
+            avg(float): the average price of the items in similar condition
+        
+        Returns:
+            price_score(int): a score for the item's price based on the average
+         """
+        if price < avg:
+            price_score = 1
+        elif price == avg:
+            price_score = 0.5
+        else:
+            price_score = 0
+        return price_score
+    
     def score(items):
         """Gives an item an overall score based on its price and condition
         
@@ -91,20 +109,37 @@ class DepopScraper:
         Side Effects:
             Modifies the score attribute of an item
         """
-        pass
+        # gets the average price for the item in new condition, used 
+        # condition, and for all listed items from a search
+        new_avg, used_avg, entire_avg = averages(items)
+        
+        for item in items:
+            if item.condition == "New":
+                item.score = score_price(item.price, new_avg)
+                item.score += 1
+            else:
+                item.score = score_price(item.price, used_avg)
+                item.score += 0.5
+            # provides a higher score if the item is also below the average price
+            # from the entire search
+            item.score += score_price(item.price, entire_avg)
     
-    def best_matches(items):
+    def best_matches(scored_items):
         """Sorts items from a search by how good of a deal they are
 
         Args:
-            items(list): The list of Items from the search with their assigned 
+            scored_items(list): The list of Items from the search with their 
+            assigned 
             scores 
 
         Returns:
             deals(list): a list of the same items but ordered from best to 
             worst deal according to our criteria 
         """
-        pass
+        # assign a score to each item from a search
+        deals_list = sorted(scored_items, key= lambda item: item.score, 
+                           reverse=True)
+        return deals_list
     
     def sort_by_price(items, ascending):
         """"Sorts items from a search either in ascending or descending order
