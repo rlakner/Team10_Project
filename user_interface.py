@@ -25,7 +25,7 @@ class DepopDealFinder:
         """
         result = simpledialog.askstring("What are you searching for?", "Enter:")
         if result:
-            messagebox.showinfo("Greeting", f"Searching for {result}!")
+            messagebox.showinfo("Greeting", f"Searching for {result}....")
             print("Searching for", result)
         
     def search_deals(self):

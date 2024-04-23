@@ -1,130 +1,177 @@
 from bs4 import BeautifulSoup
 import requests
 
-def scrape_items(search):
-    """Uses BeautifulSoup to scrape the data from the entered Depop URL
-    to find items being sold at a discounted price.
+class Item:
+    """A class for data representing an item listed on Depop
     
-    Args:
-    search(string): The item a user is searching for which will be used to add
-        to the Depop base URL 
-    
-    Returns: 
-        items(list): a list of dictionaries of the items found with the key as 
-        the name of the item and the value being a tuple containaint its price, 
-        condition, and unique direct link 
+    Attributes:
+        name(str): the name of the item (what it is listed as)
+        price(float): the price of the item
+        condition(str): the condition of the item 
+        link(str): the unique direct link to the item on Depop
+        score(float): a score representing how good of a deal the item is on a 
+            scale of from 1 to 5
     """
     
-def scrape_images(items):
-    """Uses BeautifulSoup to scrape the images of the items associated with the 
-    gathered unique direct links from scrape_items.
-    
-    Args:
-    items(list): The list of dictionaries returned by scrape_items which will
-        then be parsed to extract the unique direct links
-    
-    Returns: 
-        images(list): A list of dictionaries of the item images to be displayed
-            in the user interface, having the links as keys and the image
-            source links
-    """
+    def __init__(self, name, price, condition, link, score = 0):
+        """Initializes an Item object
+        
+        Args:
+            name(str): the name of the item (what it is listed as)
+            price(float): the price of the item
+            condition(str): the condition of the item 
+            link(str): the unique direct link to the item on Depop
+        """
+        self.name = name
+        self.price = price
+        self.condition = condition
+        self.link = link
 
-def group_by_condition(items):
-    """"Groups items into either New or Used 
+class DepopScraper:
+    """A class for scraping and analyzing data for items listed on Depop"""
     
-    Args:
-        items(list): a list of dictionaries of the items found with the key as 
-        the name of the item and the value being a tuple containaint its price, 
-        condition, and unique direct link  
-    
-    Returns:
-        new_items(list): a list of dictionaries that represent items that 
-            are either listed as 'New' or 'Like New' with the key as 
-            the name of the item and the value being a tuple containaint its 
-            price, condition, and unique direct link
-        used_items(list): a list of dictionaries that represent items that 
-            are either listed as any variation of 'Used' with the key as 
-            the name of the item and the value being a tuple containaint its 
-            price, condition, and unique direct link
-    """
+    def scrape_items(search):
+        """Uses BeautifulSoup to scrape the data from the entered Depop URL
+            to find items being sold at a discounted price.
 
-def averages(new_items_prices, used_items_prices):
-    """Calculates the average price of an item on Depop in different conditions
-    
-    Args:
-         new_items_prices(list): a list of floats the represent the price of 
-            items that result from a search that are either listed as 'New' or 
-            'Like New' 
-        used_items(list): a list of floats the represent the price of 
-            items that result from a search that are listed as any variation of 
-            'Used'
-    Returns:
-        item_averages(tuple): a tuple containing the calculated average price 
-            for the item in new condition, used condition, and for all listed 
-            items from a search, regardless of condition
-    """
-    pass
+        Args:
+            search(string): The item a user is searching for which will be used 
+            to add to the Depop base URL 
 
-def get_min_price(prices):
-    """Calculates the minimum price of items from a search on Depop
+        Returns: 
+            items(list): a list of Items found from the search
+        
+        Side Effects:
+            Creates new Items and sets their name, price, condition, and link
+            attributes 
+        
+        Raises:
+            NoItemsFound: If no items are found from the search
+        """
+        pass
     
-    Args:
-        prices(list): a list of floats the represent the price of listed items
-            that result from a search
-    
-    Returns:
-        min_price(float): the lowest price found in a search
-    """
-    pass
+    def scrape_images(items):
+        """Uses BeautifulSoup to scrape the images of the items associated with 
+            the gathered unique direct links from scrape_items.
 
-def get_max_price(prices):
-    """Calculates the maximum price of items from a search on Depop
-    
-    Args:
-        prices(list): a list of floats the represent the price of listed items
-            that result from a search
-    
-    Returns:
-        min_price(float): the highest price found in a search
-    """
-    pass
+        Args:
+            items(list): The list of Items returned by scrape_items which 
+                will then be parsed to extract the unique direct links
 
-def sort_by_price(items, ascending):
-    """"Sorts items from a search either in ascending or descending order
+        Returns: 
+            images(list): A list of dictionaries of the item images to be 
+            displayed in the user interface, having the direct links as keys and 
+            the image source links as values
+        """
+        pass
     
-    Args:
-        items(list): a list of dictionaries of the items found with the key as 
-        the name of the item and the value being a tuple containaint its price, 
-        condition, and unique direct link  
-        ascending(boolean): the desired search condition where True sorts items 
-            in ascending order and False sorts items in descending order
+    def averages(items):
+        """Calculates the average price of an item in different conditions
+
+        Args:
+            items(list): The list of Items returned by scrape_items which 
+                will then be parsed
+        
+        Returns:
+            item_averages(tuple): a tuple containing the calculated average 
+                price for the item in new condition, used condition, and for all 
+                listed items from a search, regardless of condition
+        """
+        new_prices = [item['new_price'] for item in items if 'new_price' in item]
+        used_prices = [item['used_price'] for item in items if 'used_price' in item]
+        all_prices = new_prices + used_prices
     
-    Returns:
-        sorted_items(list): a list of dictionaries sorted in the desired order
-    """
-    pass
+        if len(new_prices) > 0:
+            new_average = sum(new_prices) / len(new_prices)
+        else:
+            new_average = None
 
-
-def best_match(new_items, used_items, new_price, used_price, avg_price):
-    """Sorts items from a search by how good of a deal they are
-
-    Args:
-        new_items(list): a list of dictionaries that represent items that 
-            are either listed as 'New' or 'Like New' with the key as 
-            the name of the item and the value being a tuple containaint its 
-            price, condition, and unique direct link
-        used_items(list): a list of dictionaries that represent items that 
-            are either listed as any variation of 'Used' with the key as 
-            the name of the item and the value being a tuple containaint its 
-            price, condition, and unique direct link
-        new_price(float): the average price of the items in new or like new
-            condition
-        used_price(float): the average price of the items in used condition
-        avg_price(float): the average price of all listed items from a search, 
-            regardless of condition
+        if len(used_prices) > 0:
+            used_average = sum(used_prices) / len(used_prices)
+        else:
+            used_average = None
     
-    Returns:
-        deals(list): a list of dictionaries that is ordered from best to worst
-            deal for the item a user is searching for
-    """
-    pass
+        if len(all_prices) > 0:
+            all_average = sum(all_prices) / len(all_prices)
+        else:
+            all_average = None
+    
+        return (new_average, used_average, all_average)
+        pass
+    
+    def score_price(price, avg):
+        """Scores the price of an item
+        
+        Args:
+            price(float): the price of an item 
+            avg(float): the average price of the items in similar condition
+        
+        Returns:
+            price_score(int): a score for the item's price based on the average
+         """
+        if price < avg:
+            price_score = 1
+        elif price == avg:
+            price_score = 0.5
+        else:
+            price_score = 0
+        return price_score
+    
+    def score(items):
+        """Gives an item an overall score based on its price and condition
+        
+        Args: 
+            items(list): The list of Items returned by scrape_items which 
+                will then be parsed
+
+        Returns: None
+        
+        Side Effects:
+            Modifies the score attribute of an item
+        """
+        # gets the average price for the item in new condition, used 
+        # condition, and for all listed items from a search
+        new_avg, used_avg, entire_avg = averages(items)
+        
+        for item in items:
+            if item.condition == "New":
+                item.score = score_price(item.price, new_avg)
+                item.score += 1
+            else:
+                item.score = score_price(item.price, used_avg)
+                item.score += 0.5
+            # provides a higher score if the item is also below the average price
+            # from the entire search
+            item.score += score_price(item.price, entire_avg)
+    
+    def best_matches(scored_items):
+        """Sorts items from a search by how good of a deal they are
+
+        Args:
+            scored_items(list): The list of Items from the search with their 
+            assigned 
+            scores 
+
+        Returns:
+            deals(list): a list of the same items but ordered from best to 
+            worst deal according to our criteria 
+        """
+        # assign a score to each item from a search
+        deals_list = sorted(scored_items, key= lambda item: item.score, 
+                           reverse=True)
+        return deals_list
+    
+    def sort_by_price(items, ascending):
+        """"Sorts items from a search either in ascending or descending order
+
+        Args:
+            items(list): The list of Items from the search with their assigned 
+            scores  
+            ascending(boolean): the desired search condition where True sorts 
+            items in ascending order and False sorts items in descending order
+
+        Returns:
+            sorted_items(list): a list of Items sorted in the desired order
+        """
+        sorted_items = sorted(items, key=lambda x: x['price'], reverse=not ascending)
+        return sorted_items
