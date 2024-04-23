@@ -77,7 +77,28 @@ class DepopScraper:
                 price for the item in new condition, used condition, and for all 
                 listed items from a search, regardless of condition
         """
+        new_prices = [item['new_price'] for item in items if 'new_price' in item]
+        used_prices = [item['used_price'] for item in items if 'used_price' in item]
+        all_prices = new_prices + used_prices
+    
+        if len(new_prices) > 0:
+            new_average = sum(new_prices) / len(new_prices)
+        else:
+            new_average = None
+
+        if len(used_prices) > 0:
+            used_average = sum(used_prices) / len(used_prices)
+        else:
+            used_average = None
+    
+        if len(all_prices) > 0:
+            all_average = sum(all_prices) / len(all_prices)
+        else:
+            all_average = None
+    
+        return (new_average, used_average, all_average)
         pass
+    
     
     def score_price(price, avg):
         """Scores the price of an item
@@ -153,5 +174,6 @@ class DepopScraper:
         Returns:
             sorted_items(list): a list of Items sorted in the desired order
         """
-        pass
-    
+        sorted_items = sorted(items, key=lambda x: x['price'], reverse=not ascending)
+        return sorted_items
+        
