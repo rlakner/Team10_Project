@@ -69,8 +69,8 @@ class DepopScraper:
         soup = bs(source, "html.parser")
         listings = soup.find('ul', class_='styles__ProductListGrid-sc-4aad5806-1 hGGFgp')
 
+        temp_list = []
         items_list = []
-        complete_list = []
 
         for listing in listings:
             price_div = listing.find('div', class_='Price-styles__PriceWithDiscountWrapper-sc-f7c1dfcc-2')
@@ -78,9 +78,9 @@ class DepopScraper:
                 disc_price = price_div.find('p', class_='sc-eDnWTT Price-styles__DiscountPrice-sc-f7c1dfcc-1 fRxqiS KMEBr').text
                 link = f"http://depop.com{listing.find('a', class_='styles__ProductCard-sc-4aad5806-4 ffvUlI')['href']}"
             
-        items_list.append([disc_price, link])   
+        temp_list.append([disc_price, link])   
 
-        for item in items_list:
+        for item in temp_list:
             driver.get(item[1])
             item_source = driver.page_source
             item_soup = bs(item_source, "html.parser")  
@@ -89,11 +89,13 @@ class DepopScraper:
             p = info_div.find_all('p', class_='sc-eDnWTT ProductAttributes-styles__Attribute-sc-303d66c3-0 kcKICQ iIJjeL')
             condition = p[1].text
     
-            complete_list.append({name:(item[0], condition, item[1],)})
+            #items_list.append({name: item[0], condition, item[1]})
+            items_list.append(Item(name, item[0], condition, item[1] ))
+            
 
         time.sleep(10)
         driver.quit()
-        return complete_list
+        return items_list
     
     def scrape_images(items):
         """Uses BeautifulSoup to scrape the images of the items associated with 
