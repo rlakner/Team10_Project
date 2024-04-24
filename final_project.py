@@ -13,7 +13,7 @@ class Item:
         condition(str): the condition of the item 
         link(str): the unique direct link to the item on Depop
         score(float): a score representing how good of a deal the item is on a 
-            scale of from 1 to 5
+            scale of from 0 to 3
     """
     
     def __init__(self, name, price, condition, link, score = 0):
@@ -137,10 +137,15 @@ class DepopScraper:
                 price for the item in new condition, used condition, and for all 
                 listed items from a search, regardless of condition
         """
-        new_prices = [item['new_price'] for item in items if 'new_price' in item]
-        used_prices = [item['used_price'] for item in items if 'used_price' in item]
+        new_prices = []
+        used_prices = []
+        for item in items:
+            if item.condition == "New":
+                new_prices.append(item.price)
+            elif item.condition == "Used":
+                used_prices.append(item.price)
         all_prices = new_prices + used_prices
-    
+        
         if len(new_prices) > 0:
             new_average = sum(new_prices) / len(new_prices)
         else:
@@ -157,7 +162,6 @@ class DepopScraper:
             all_average = None
     
         return (new_average, used_average, all_average)
-        pass
     
     def score_price(price, avg):
         """Scores the price of an item
