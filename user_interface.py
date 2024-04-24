@@ -13,8 +13,9 @@ class DepopDealFinder:
         self.window.geometry("400x300")
         self.window.title("Depop Deal Finder")
         self.window.protocol("WM_DELETE_WINDOW", self.parent.quit)
-        self.button = tk.Button(self.window, text="Enter", command=self.popupmsg)
-        self.button.place(x=20, y=150)
+        self.button = tk.Button(self.window, text="Start Finding Deals"
+                                , command=self.popupmsg)
+        self.button.place(x=120, y=150)
     
     def popupmsg(self):
         """
