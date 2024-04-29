@@ -6,7 +6,7 @@ import time
 import tkinter as tk
 from tkinter import scrolledtext
 import pandas as pd
-from data_analysis import Analysis
+from Team10_Project.data_analysis import Analysis
 
 class Item:
     """A class for data representing an item listed on Depop
