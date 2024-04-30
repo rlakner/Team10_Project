@@ -49,7 +49,7 @@ class Search:
         while True:
             x += 1
             driver.execute_script('scrollBy(0,50)')
-            if x > 500: #Change this to make it scroll for longer
+            if x > 1000: #Change this to make it scroll for longer
                 break
     
         source = driver.page_source
