@@ -172,7 +172,7 @@ class Interface:
         items_info = []
         for item in sorted_items:
             item_info = {
-                "Name": item.name,
+                "Product Name": item.name,
                 "Condition": item.condition,
                 "Price": f'${item.price}',
                 "Link": item.link,
