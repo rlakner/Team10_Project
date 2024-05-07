@@ -36,10 +36,29 @@ class Item:
 class Search:
     """A class for scraping and analyzing data for items listed on Depop"""
     def __init__(self, query):
+        """Initializes a search query to be used in scrape_items
+        
+        Args:
+        query(str): The string value of the user input from the query interface
+        which will be used in the url for Selenium
+        
+        """
+        
         self.query = query
         self.items_list = []
         
     def scrape_items(self):
+        """Uses Selenium and BeautifulSoup to navigate through Depop listings
+        and scrape information regarding the name, price, condition, and link 
+        of the items
+
+        Args: None
+
+        Returns: 
+            items_list(list): A list of Item objects that contain the name, 
+            price, condition, and link of the scraped item
+        """
+        
         url = f'https://www.depop.com/search/?q={self.query}'
         service = Service(executable_path="/usr/local/bin/chromedriver") #Change to your path
         driver = webdriver.Chrome(service=service)
