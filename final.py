@@ -8,7 +8,7 @@ from tkinter import scrolledtext
 import pandas as pd
 from data_analysis import Analysis
 
-service = Service(executable_path="/usr/local/bin/chromedriver") #Change to your path
+service = Service(executable_path="../chromedriver.exe") #Change to your path
 driver = webdriver.Chrome(service=service)
 
 class Item:
@@ -59,7 +59,6 @@ class Search:
 
         Returns: None
         """
-        
         url = f'https://www.depop.com/search/?q={self.query}'
         driver.get(url)
 
@@ -69,11 +68,10 @@ class Search:
             driver.execute_script('scrollBy(0,50)')
             if x > 500: #Change this to make it scroll for longer
                 break
-    
+        
         source = driver.page_source
         soup = bs(source, "html.parser")
         listings = soup.find('ul', class_='styles__ProductListGrid-sc-4aad5806-1 hGGFgp')
-
         self.temp_list = []
         self.check = 0
         
@@ -90,6 +88,7 @@ class Search:
               
         self.check = 1
         
+        
     def scrape_items(self):
         """Uses Selenium and BeautifulSoup to navigate through Depop listings
         and scrape information on each individual page regarding the name and
@@ -102,10 +101,10 @@ class Search:
             price, condition, and link of the scraped item
         """
         
+        
         self.init_scrape()
         
-        while self.check == 1:
-        
+        while self.check == 1: 
             for item in self.temp_list:
                 driver.get(item[1])
                 item_source = driver.page_source
