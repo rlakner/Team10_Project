@@ -8,6 +8,10 @@ from tkinter import scrolledtext
 import pandas as pd
 from data_analysis import Analysis
 
+service = Service(executable_path=
+                          "../chromedriver.exe") #Change to your path
+driver = webdriver.Chrome(service=service)
+
 class Item:
     """A class for data representing an item listed on Depop
     
@@ -44,6 +48,82 @@ class Search:
         """
         self.query = query
         self.items_list = []
+    
+    def init_scrape(self):
+        url = f'https://www.depop.com/search/?q={self.query}'
+        driver.get(url)
+
+        x = 0
+        while True:
+            x += 1
+            driver.execute_script('scrollBy(0,50)')
+            if x > 500: #Change this to make it scroll for longer
+                break
+    
+        source = driver.page_source
+        soup = bs(source, "html.parser")
+        listings = soup.find('ul', class_='styles__ProductListGrid'
+                             '-sc-4aad5806-1 hGGFgp')
+        error = soup.findAll(text="Sorry, we couldn't find anything")
+
+        if not listings and error:
+            self.ignore = True
+            print("No items found. Please adjust your search.")
+            return []
+        
+        self.temp_list = []
+        self.check = 0
+        
+        if listings is not None:
+            for listing in listings:
+                #Gets the direct link to the item
+                link = f"http://depop.com{listing.find('a', 
+                        class_='styles__ProductCard-sc-4aad5806-4 ffvUlI')
+                        ['href']}"
+                
+                # Gets the discounted price, if there is one
+                disc_price = listing.find('div', class_='Price-styles__Price'
+                                          'WithDiscountWrapper-sc-f7c1dfcc-2')
+                if disc_price:
+                    price_element = disc_price.find('p', class_='sc-eDnWTT '
+                                        'Price-styles__DiscountPrice-sc-f7c1'
+                                                    'dfcc-1 fRxqiS KMEBr')
+                    price_text = price_element.text.strip('$')
+                    price = float(price_text)
+                # Gets the full price if the item is not on sale
+                else:
+                    price_element = listing.find('p', class_='sc-eDnWTT Price-'
+                                                'styles__FullPrice-sc-f7c1dfcc-'
+                                                '0 fRxqiS hmFDou')
+                    price = float(price_element.text.strip('$'))
+                self.temp_list.append([price, link])
+                self.check = 1
+            
+            if listings is None:
+                source = driver.page_source
+                soup = bs(source, "html.parser")
+                listings = soup.find('ul', class_='styles__ProductListGrid-sc-4'
+                                     'aad5806-1 hGGFgp')
+                for listing in listings:
+                    link = f"http://depop.com{listing.find('a', class_='styles_'
+                    '_ProductCard-sc-4aad5806-4 ffvUlI')['href']}"
+                    # gets the price
+                    disc_price = listing.find('div', class_='Price-styles__Pric'
+                                              'eWithDiscountWrapper-sc-'
+                                              'f7c1dfcc-2')
+                    if disc_price:
+                        price = float(disc_price.find('p', class_='sc-eDnWTT '
+                                                      'Price-styles__Discount'
+                                                      'Price-sc-f7c1dfcc-1 '
+                                                'fRxqiS KMEBr').text.strip('$'))
+                    else:
+                        price_element = listing.find('p', class_='sc-eDnWTT '
+                                                     'Price-styles__FullPrice'
+                                                     '-sc-f7c1dfcc-0 fRxqiS '
+                                                     'hmFDou')
+                        price = float(price_element.text.strip('$'))
+                    self.temp_list.append([price, link])
+                    self.check = 1
         
     def scrape_items(self):
         """Uses Selenium and BeautifulSoup to navigate through Depop listings
@@ -60,114 +140,51 @@ class Search:
             - Modifies the items_list attribute
         """
         
-        url = f'https://www.depop.com/search/?q={self.query}'
-        service = Service(executable_path=
-                          "/usr/local/bin/chromedriver") #Change to your path
-        driver = webdriver.Chrome(service=service)
-        driver.get(url)
-
-        x = 0
-        while True:
-            x += 1
-            driver.execute_script('scrollBy(0,50)')
-            if x > 500: #Change this to make it scroll for longer
-                break
-    
-        source = driver.page_source
-        soup = bs(source, "html.parser")
-        listings = soup.find('ul', class_='styles__ProductListGrid'
-                             '-sc-4aad5806-1 hGGFgp')
-        if not listings:
-            print("No items found. Please adjust your search.")
-            return []
+        self.init_scrape()
         
-        temp_list = []
-        for listing in listings:
-            #Gets the direct link to the item
-            link = f"http://depop.com{listing.find('a', 
-                    class_='styles__ProductCard-sc-4aad5806-4 ffvUlI')['href']}"
-            
-            # Gets the discounted price, if there is one
-            disc_price = listing.find('div', class_='Price-styles__PriceWith'
-                                      'DiscountWrapper-sc-f7c1dfcc-2')
-            if disc_price:
-                price_element = disc_price.find('p', class_='sc-eDnWTT Price-'
-                                                'styles__DiscountPrice-sc-f7c1'
-                                                'dfcc-1 fRxqiS KMEBr')
-                price_text = price_element.text.strip('$')
-                price = float(price_text)
-            # Gets the full price if the item is not on sale
-            else:
-                price_element = listing.find('p', class_='sc-eDnWTT Price-'
-                                             'styles__FullPrice-sc-f7c1dfcc-0 '
-                                             'fRxqiS hmFDou')
-                price = float(price_element.text.strip('$'))
-            temp_list.append([price, link])   
+        if self.ignore == True:
+            return
+        
+        while self.check == 1:   
         
         #Gets the name, price, and condition 
-        for item in temp_list:
-            driver.get(item[1])
-            item_source = driver.page_source
-            item_soup = bs(item_source, "html.parser")  
-            name_div = item_soup.find('div', class_='styles__ContentWrapper-sc'
-                                      '-569ef83f-3 cyzIGA')
-            find_name = name_div.find('h1', class_='sc-grYavY styles__Mobile'
-                                      'ProductTitle-sc-569ef83f-9 HXICV cTNEru')
-            brand_div = item_soup.find('div', class_ = 'ProductAttributes-'
-                                       'styles__Attributes-sc-303d66c3-1 dIfGXO'
-                                       ' styles__StyledProductAttributes-sc-569'
-                                       'ef83f-16 hcLsNE')
-            find_brand = brand_div.find('a', class_='sc-eDnWTT Product'
-                                        'Attributes-styles__Attribute-sc-'
-                                        '303d66c3-0 kcKICQ iIJjeL')
-            find_condition = item_soup.find_all('p', class_='sc-eDnWTT Product'
-                                                'Attributes-styles__Attribute-'
-                                                'sc-303d66c3-0 kcKICQ iIJjeL')[1]
-            #For items without a name, set the name to an item of the brand
-            if find_name:
-                name = find_name.text
-            else:
-                brand = find_brand.text
-                name = f"{brand} Item"
-            
-            #Gets the condition    
-            if find_condition:
-                condition_text = find_condition.text.lower()
-                if "new" in condition_text:
-                    condition = "New"
+            for item in self.temp_list:
+                driver.get(item[1])
+                item_source = driver.page_source
+                item_soup = bs(item_source, "html.parser")  
+                name_div = item_soup.find('div', class_='styles__ContentWrapper'
+                                          '-sc-569ef83f-3 cyzIGA')
+                find_name = name_div.find('h1', class_='sc-grYavY styles__Mobil'
+                                    'eProductTitle-sc-569ef83f-9 HXICV cTNEru')
+                brand_div = item_soup.find('div', class_ = 'ProductAttributes-'
+                                    'styles__Attributes-sc-303d66c3-1 dIfGXO'
+                                    ' styles__StyledProductAttributes-sc-569'
+                                    'ef83f-16 hcLsNE')
+                find_brand = brand_div.find('a', class_='sc-eDnWTT Product'
+                                            'Attributes-styles__Attribute-sc-'
+                                            '303d66c3-0 kcKICQ iIJjeL')
+                find_condition = item_soup.find_all('p', class_='sc-eDnWTT Pro'
+                                            'ductAttributes-styles__Attribute-'
+                                            'sc-303d66c3-0 kcKICQ iIJjeL')[1]
+                #For items without a name, set the name to an item of the brand
+                if find_name:
+                    name = find_name.text
                 else:
-                    condition = "Used"
-            self.items_list.append(Item(name, item[0], condition, item[1]))
-        
-        time.sleep(10)
-        driver.quit()
-        return self.items_list
-    
-    def scrape_images(self):
-        """Uses BeautifulSoup to scrape the images of the items associated with 
-            the gathered unique direct links from scrape_items.
+                    brand = find_brand.text
+                    name = f"{brand} Item"
+                
+                #Gets the condition    
+                if find_condition:
+                    condition_text = find_condition.text.lower()
+                    if "new" in condition_text:
+                        condition = "New"
+                    else:
+                        condition = "Used"
+                self.items_list.append(Item(name, item[0], condition, item[1]))
             
-        Returns: 
-            images(list): A list of dictionaries of the item images to be 
-            displayed in the user interface, having the direct links as keys and 
-            the image source links as values
-        """
-        images = []
-        service = Service(executable_path=
-                          "/usr/local/bin/chromedriver") #Change to your path
-        driver = webdriver.Chrome(service=service)
-        
-        for item in self.items_list:
-            driver.get(item.link)
-            item_source = driver.page_source
-            item_soup = bs(item_source, "html.parser")
-            info_div = item_soup.find('div', class_='styles__Layout-sc-'
-                                      '569ef83f-2 MYFCM')
-            img = info_div.find('img')['src']
-            name = info_div.find('img')['alt']
-            
-            images.append({img: name})
-        return images
+            time.sleep(10)
+            driver.quit()
+            return self.items_list
     
 class Interface:
     """
