@@ -46,7 +46,8 @@ will open and start scraping through Depop
 - You will see this process in real time as the driver scrolls and then gets 
 information for each item listed in the results page within the scroll limit
 (it will look like as if someone is controlling your computer)
-- Once the driver is finished, it will wait 10 seconds before it closes
+- Once the driver is finished, it will wait 10 seconds before it closes and 
+displays the results (if it found any)
 - You will be redirected to the pop up window once again which will have the 
 results of the search sorted by their score, price, and condition 
 - If you find an item you are interested in based on the information provided,
