@@ -38,7 +38,7 @@ STEP 3 -  UPDATE PATH IN CODE
 line of code will say: service = Service() and #Change your path here
 - Change the value of the executable_path by pasting the path from step 2
 
-STEP 4 - USING THE PROGRAM
+STEP 4 - USE THE PROGRAM
 - When you execute the deal_finder script, there will be a pop up window
 that prompts you to enter a search
 - Once you click on the Start Finding Deals button, the ChromeDriver application
