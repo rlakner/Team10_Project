@@ -36,14 +36,12 @@ class Item:
 class Search:
     """A class for scraping and analyzing data for items listed on Depop"""
     def __init__(self, query):
-        """Initializes a search query to be used in scrape_items
+        """Initializes a Search with a query to find items
         
         Args:
-        query(str): The string value of the user input from the query interface
-        which will be used in the url for Selenium
-        
+            query(str): The string value of the user input from the interface
+            which will be used in the url for Selenium
         """
-        
         self.query = query
         self.items_list = []
         
@@ -52,15 +50,19 @@ class Search:
         and scrape information regarding the name, price, condition, and link 
         of the items
 
-        Args: None
-
         Returns: 
             items_list(list): A list of Item objects that contain the name, 
             price, condition, and link of the scraped item
+        
+        Side Effects:
+            - Creates new Item objects and sets their name, price, condition, 
+            and link attributes 
+            - Modifies the items_list attribute
         """
         
         url = f'https://www.depop.com/search/?q={self.query}'
-        service = Service(executable_path="/usr/local/bin/chromedriver") #Change to your path
+        service = Service(executable_path=
+                          "/usr/local/bin/chromedriver") #Change to your path
         driver = webdriver.Chrome(service=service)
         driver.get(url)
 
@@ -73,30 +75,52 @@ class Search:
     
         source = driver.page_source
         soup = bs(source, "html.parser")
-        listings = soup.find('ul', class_='styles__ProductListGrid-sc-4aad5806-1 hGGFgp')
+        listings = soup.find('ul', class_='styles__ProductListGrid'
+                             '-sc-4aad5806-1 hGGFgp')
 
         temp_list = []
-
         for listing in listings:
-            link = f"http://depop.com{listing.find('a', class_='styles__ProductCard-sc-4aad5806-4 ffvUlI')['href']}"
-            # gets the price
-            disc_price = listing.find('div', class_='Price-styles__PriceWithDiscountWrapper-sc-f7c1dfcc-2')
+            #Gets the direct link to the item
+            link = f"http://depop.com{listing.find('a', 
+                    class_='styles__ProductCard-sc-4aad5806-4 ffvUlI')['href']}"
+            
+            # Gets the discounted price, if there is one
+            disc_price = listing.find('div', class_='Price-styles__PriceWith'
+                                      'DiscountWrapper-sc-f7c1dfcc-2')
             if disc_price:
-                price = float(disc_price.find('p', class_='sc-eDnWTT Price-styles__DiscountPrice-sc-f7c1dfcc-1 fRxqiS KMEBr').text.strip('$'))
+                price_element = disc_price.find('p', class_='sc-eDnWTT Price-'
+                                                'styles__DiscountPrice-sc-f7c1'
+                                                'dfcc-1 fRxqiS KMEBr')
+                price_text = price_element.text.strip('$')
+                price = float(price_text)
+            # Gets the full price if the item is not on sale
             else:
-                price_element = listing.find('p', class_='sc-eDnWTT Price-styles__FullPrice-sc-f7c1dfcc-0 fRxqiS hmFDou')
+                price_element = listing.find('p', class_='sc-eDnWTT Price-'
+                                             'styles__FullPrice-sc-f7c1dfcc-0 '
+                                             'fRxqiS hmFDou')
                 price = float(price_element.text.strip('$'))
             temp_list.append([price, link])   
         
+        #Gets the name, price, and condition 
         for item in temp_list:
             driver.get(item[1])
             item_source = driver.page_source
             item_soup = bs(item_source, "html.parser")  
-            name_div = item_soup.find('div', class_='styles__ContentWrapper-sc-569ef83f-3 cyzIGA')
-            find_name = name_div.find('h1', class_='sc-grYavY styles__MobileProductTitle-sc-569ef83f-9 HXICV cTNEru')
-            brand_div = item_soup.find('div', class_ = 'ProductAttributes-styles__Attributes-sc-303d66c3-1 dIfGXO styles__StyledProductAttributes-sc-569ef83f-16 hcLsNE')
-            find_brand = brand_div.find('a', class_='sc-eDnWTT ProductAttributes-styles__Attribute-sc-303d66c3-0 kcKICQ iIJjeL')
-            find_condition = item_soup.find_all('p', class_='sc-eDnWTT ProductAttributes-styles__Attribute-sc-303d66c3-0 kcKICQ iIJjeL')[1]
+            name_div = item_soup.find('div', class_='styles__ContentWrapper-sc'
+                                      '-569ef83f-3 cyzIGA')
+            find_name = name_div.find('h1', class_='sc-grYavY styles__Mobile'
+                                      'ProductTitle-sc-569ef83f-9 HXICV cTNEru')
+            brand_div = item_soup.find('div', class_ = 'ProductAttributes-'
+                                       'styles__Attributes-sc-303d66c3-1 dIfGXO'
+                                       ' styles__StyledProductAttributes-sc-569'
+                                       'ef83f-16 hcLsNE')
+            find_brand = brand_div.find('a', class_='sc-eDnWTT Product'
+                                        'Attributes-styles__Attribute-sc-'
+                                        '303d66c3-0 kcKICQ iIJjeL')
+            find_condition = item_soup.find_all('p', class_='sc-eDnWTT Product'
+                                                'Attributes-styles__Attribute-'
+                                                'sc-303d66c3-0 kcKICQ iIJjeL')[1]
+            #For items without a name, set the name to an item of the brand
             if find_name:
                 name = find_name.text
             else:
@@ -118,25 +142,23 @@ class Search:
     def scrape_images(self):
         """Uses BeautifulSoup to scrape the images of the items associated with 
             the gathered unique direct links from scrape_items.
-
-        Args:
-            items(list): The list of Items returned by scrape_items which 
-                will then be parsed to extract the unique direct links
-
+            
         Returns: 
             images(list): A list of dictionaries of the item images to be 
             displayed in the user interface, having the direct links as keys and 
             the image source links as values
         """
         images = []
-        service = Service(executable_path="/usr/local/bin/chromedriver") #Change to your path
+        service = Service(executable_path=
+                          "/usr/local/bin/chromedriver") #Change to your path
         driver = webdriver.Chrome(service=service)
         
         for item in self.items_list:
             driver.get(item.link)
             item_source = driver.page_source
             item_soup = bs(item_source, "html.parser")
-            info_div = item_soup.find('div', class_='styles__Layout-sc-569ef83f-2 MYFCM')
+            info_div = item_soup.find('div', class_='styles__Layout-sc-'
+                                      '569ef83f-2 MYFCM')
             img = info_div.find('img')['src']
             name = info_div.find('img')['alt']
             
@@ -145,10 +167,18 @@ class Search:
     
 class Interface:
     """
-    A user interface for an application to help Depop users find reasonable 
-    prices on clothes by analyzing data scraped from the Depop website 
+    A class for a user interface for an application to help users find 
+    reasonably priced clothes by analyzing data scraped from the Depop website
+    
+    Attributes:
+        parent: a parent object that manages the interface
+        window: a window from Tkinter Toplevel for the interface
+        entry_label: a Tkinter label to prompt users for a search
+        entry: gets the user input query using Tkinter Entry  
+        button: a Tkinter button that will start the deal finding process
     """
     def __init__(self, parent):
+        """Initializes an instance of an Interface"""
         self.parent = parent
         self.window = tk.Toplevel()
         self.window.geometry("1190x1000")
@@ -165,12 +195,7 @@ class Interface:
         self.button.place(x=515, y=100)
     
     def popupmsg(self):
-        """
-        Display a popup message with a given message
-        
-        Args:
-        - msg (str): the message to be displayed to user in popup
-        """
+        """Displays a popup message with a given message"""
         self.query = self.entry.get()
         if self.query:
             if " " in self.query:
@@ -200,7 +225,8 @@ class Interface:
             items_info.append(item_info)
         products = pd.DataFrame(items_info)
         pd.set_option('display.colheader_justify', 'center')
-        products_text = scrolledtext.ScrolledText(self.window, width=165, height=40)
+        products_text = scrolledtext.ScrolledText(self.window, width=165,
+                                                  height=40)
         products_text.place(x=5, y=150)
         products_text.insert(tk.END, products.to_string(index=False))
         
