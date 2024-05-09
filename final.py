@@ -8,7 +8,7 @@ from tkinter import scrolledtext
 import pandas as pd
 from data_analysis import Analysis
 
-service = Service(executable_path="../chromedriver.exe") #Change to your path
+service = Service(executable_path="/usr/local/bin/chromedriver") #Change to your path
 driver = webdriver.Chrome(service=service)
 
 class Item:
