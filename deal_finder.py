@@ -77,7 +77,10 @@ class Search:
         soup = bs(source, "html.parser")
         listings = soup.find('ul', class_='styles__ProductListGrid'
                              '-sc-4aad5806-1 hGGFgp')
-
+        if not listings:
+            print("No items found. Please adjust your search.")
+            return []
+        
         temp_list = []
         for listing in listings:
             #Gets the direct link to the item
@@ -210,17 +213,21 @@ class Interface:
         if self.query:
             if " " in self.query:
                 self.query.replace(" ","+")
-            message = (f"Happy Shopping!")
-        label = tk.Label(self.window, text=message)
-        label.place(x=530, y=130)
+            scraper = Search(self.query)
+            items = scraper.scrape_items()
         
-        scraper = Search(self.query)
-        items = scraper.scrape_items()
-
-        analyzer = Analysis()
-        scored_items = analyzer.score(items)
-        sorted_items = analyzer.best_matches(scored_items)
-        self.display_deals(sorted_items)
+        if not items:
+            message = "We did not find any results. Please try another search."
+            label = tk.Label(self.window, text=message)
+            label.place(x=438, y=430)       
+        else: 
+            message = (f"Happy Shopping!")
+            label = tk.Label(self.window, text=message)
+            label.place(x=530, y=130)
+            analyzer = Analysis()
+            scored_items = analyzer.score(items)
+            sorted_items = analyzer.best_matches(scored_items)
+            self.display_deals(sorted_items)
         
     def display_deals(self, sorted_items):
         """Creates a dataframe for deals found on Depop
