@@ -126,7 +126,8 @@ class Search:
             else:
                 brand = find_brand.text
                 name = f"{brand} Item"
-                
+            
+            #Gets the condition    
             if find_condition:
                 condition_text = find_condition.text.lower()
                 if "new" in condition_text:
@@ -178,7 +179,11 @@ class Interface:
         button: a Tkinter button that will start the deal finding process
     """
     def __init__(self, parent):
-        """Initializes an instance of an Interface"""
+        """Initializes an instance of an Interface to get a query input
+        
+        Side Effects:
+            Creates a pop up window that users can interact with
+        """
         self.parent = parent
         self.window = tk.Toplevel()
         self.window.geometry("1190x1000")
@@ -195,7 +200,12 @@ class Interface:
         self.button.place(x=515, y=100)
     
     def popupmsg(self):
-        """Displays a popup message with a given message"""
+        """Takes a users query and uses it to scrape through Depop
+        
+        Side Effects:
+            Modifies the query attribute 
+            Creates instances of Search and Analysis 
+        """
         self.query = self.entry.get()
         if self.query:
             if " " in self.query:
@@ -213,6 +223,14 @@ class Interface:
         self.display_deals(sorted_items)
         
     def display_deals(self, sorted_items):
+        """Creates a dataframe for deals found on Depop
+        
+        Args:
+            sorted_items(list): a list of Items found and sorted by best match
+        
+        Side Effects:
+            Creates and displays the dataframe of deals within the pop up 
+        """
         items_info = []
         for item in sorted_items:
             item_info = {
