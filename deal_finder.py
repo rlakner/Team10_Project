@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
 import time
 import tkinter as tk
 from tkinter import scrolledtext
@@ -33,6 +32,7 @@ class Item:
         self.price = price
         self.condition = condition
         self.link = link
+        
 class Search:
     """A class for scraping and analyzing data for items listed on Depop"""
     def __init__(self, query):
@@ -129,7 +129,7 @@ class Search:
                 brand = find_brand.text
                 name = f"{brand} Item"
             
-            #Gets the condition    
+            #Gets the condition of the item
             if find_condition:
                 condition_text = find_condition.text.lower()
                 if "new" in condition_text:
@@ -238,7 +238,6 @@ class Interface:
 
     def display_deals(self, sorted_items):
         """Creates a dataframe for deals found on Depop
-        
         Args:
             sorted_items(list): a list of Items found and sorted by best match
         
@@ -251,14 +250,14 @@ class Interface:
                 "Product Name": item.name,
                 "Condition": item.condition,
                 "Price": f'${item.price}',
-                "Link": item.link,
-                "Our Score (0-3)": item.score
+                "Our Score (0-3)": item.score,
+                "Link": item.link
             }
             items_info.append(item_info)
         products = pd.DataFrame(items_info)
         pd.set_option('display.colheader_justify', 'center')
         products_text = scrolledtext.ScrolledText(self.window, width=165,
-                                                  height=40)
+                                                  height=40, wrap = tk.NONE)
         products_text.place(x=5, y=150)
         products_text.insert(tk.END, products.to_string(index=False))
         
