@@ -64,15 +64,17 @@ class Search:
         soup = bs(source, "html.parser")
         listings = soup.find('ul', class_='styles__ProductListGrid'
                              '-sc-4aad5806-1 hGGFgp')
-        error = soup.findAll(text="Sorry, we couldn't find anything")
+        error = soup.findAll(string="Sorry, we couldn't find anything")
 
         if not listings and error:
+            print(1)
             self.ignore = True
             print("No items found. Please adjust your search.")
             return []
         
         self.temp_list = []
         self.check = 0
+        self.ignore = False
         
         if listings is not None:
             for listing in listings:
@@ -141,12 +143,12 @@ class Search:
         """
         
         self.init_scrape()
-        
+        print(self.check)
         if self.ignore == True:
             return
         
         while self.check == 1:   
-        
+            print(3)
         #Gets the name, price, and condition 
             for item in self.temp_list:
                 driver.get(item[1])
