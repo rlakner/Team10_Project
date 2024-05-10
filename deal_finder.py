@@ -58,7 +58,6 @@ class Search:
             and link attributes 
             - Modifies the items_list attribute
         """
-        
         url = f'https://www.depop.com/search/?q={self.query}'
         service = Service(executable_path=
                           "/usr/local/bin/chromedriver") #Change to your path
@@ -74,7 +73,7 @@ class Search:
         source = driver.page_source
         soup = bs(source, "html.parser")
         listings = soup.find('ul', class_='styles__ProductListGrid'
-                             '-sc-4aad5806-1 hGGFgp')
+                                        '-sc-4aad5806-1 hGGFgp')
 
         if not listings:
             print("No items found. Please adjust your search.")
@@ -103,7 +102,7 @@ class Search:
                 price = float(price_element.text.strip('$'))
             temp_list.append([price, link])   
         
-        #Gets the name, price, and condition 
+        #Gets the name, brand, and condition 
         for item in temp_list:
             driver.get(item[1])
             item_source = driver.page_source
