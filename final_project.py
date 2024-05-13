@@ -13,7 +13,7 @@ class Item:
         condition(str): the condition of the item 
         link(str): the unique direct link to the item on Depop
         score(float): a score representing how good of a deal the item is on a 
-            scale of from 0 to 3
+            scale of from 1 to 5
     """
     
     def __init__(self, name, price, condition, link, score = 0):
@@ -53,7 +53,7 @@ class DepopScraper:
         """
         url = f'https://www.depop.com/search/?q={search}'
 
-        service = Service(executable_path="chromedriver.exe") #Change to your path
+        service = Service(executable_path="chromedriver.exe")
         driver = webdriver.Chrome(service=service)
 
         driver.get(url)
@@ -69,8 +69,8 @@ class DepopScraper:
         soup = bs(source, "html.parser")
         listings = soup.find('ul', class_='styles__ProductListGrid-sc-4aad5806-1 hGGFgp')
 
-        temp_list = []
         items_list = []
+        complete_list = []
 
         for listing in listings:
             price_div = listing.find('div', class_='Price-styles__PriceWithDiscountWrapper-sc-f7c1dfcc-2')
@@ -78,9 +78,9 @@ class DepopScraper:
                 disc_price = price_div.find('p', class_='sc-eDnWTT Price-styles__DiscountPrice-sc-f7c1dfcc-1 fRxqiS KMEBr').text
                 link = f"http://depop.com{listing.find('a', class_='styles__ProductCard-sc-4aad5806-4 ffvUlI')['href']}"
             
-        temp_list.append([disc_price, link])   
+        items_list.append([disc_price, link])   
 
-        for item in temp_list:
+        for item in items_list:
             driver.get(item[1])
             item_source = driver.page_source
             item_soup = bs(item_source, "html.parser")  
@@ -89,13 +89,11 @@ class DepopScraper:
             p = info_div.find_all('p', class_='sc-eDnWTT ProductAttributes-styles__Attribute-sc-303d66c3-0 kcKICQ iIJjeL')
             condition = p[1].text
     
-            #items_list.append({name: item[0], condition, item[1]})
-            items_list.append(Item(name, item[0], condition, item[1] ))
-            
+            complete_list.append({name:(item[0], condition, item[1],)})
 
         time.sleep(10)
         driver.quit()
-        return items_list
+        return complete_list
     
     def scrape_images(items):
         """Uses BeautifulSoup to scrape the images of the items associated with 
@@ -139,15 +137,10 @@ class DepopScraper:
                 price for the item in new condition, used condition, and for all 
                 listed items from a search, regardless of condition
         """
-        new_prices = []
-        used_prices = []
-        for item in items:
-            if item.condition == "New":
-                new_prices.append(item.price)
-            elif item.condition == "Used":
-                used_prices.append(item.price)
+        new_prices = [item['new_price'] for item in items if 'new_price' in item]
+        used_prices = [item['used_price'] for item in items if 'used_price' in item]
         all_prices = new_prices + used_prices
-        
+    
         if len(new_prices) > 0:
             new_average = sum(new_prices) / len(new_prices)
         else:
