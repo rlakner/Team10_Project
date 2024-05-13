@@ -9,7 +9,7 @@ import pandas as pd
 from data_analysis import Analysis
 
 service = Service(executable_path=
-                          "/usr/local/bin/chromedriver") #Change to your path
+                          "../chromedriver.exe") #Change to your path
 driver = webdriver.Chrome(service=service)
 
 class Item:
@@ -53,11 +53,13 @@ class Search:
         url = f'https://www.depop.com/search/?q={self.query}'
         driver.get(url)
 
+        time.sleep(2)
+        
         x = 0
         while True:
             x += 1
             driver.execute_script('scrollBy(0,50)')
-            if x > 500: #Change this to make it scroll for longer
+            if x > 50: #Change this to make it scroll for longer
                 break
     
         source = driver.page_source
@@ -96,7 +98,8 @@ class Search:
                     price_element = listing.find('p', class_='sc-eDnWTT Price-'
                                                 'styles__FullPrice-sc-f7c1dfcc-'
                                                 '0 fRxqiS hmFDou')
-                    price = float(price_element.text.strip('$'))
+                    price_string = price_element.text
+                    price = float(price_string[1:])
                 self.temp_list.append([price, link])
                 self.check = 1
             
@@ -122,7 +125,8 @@ class Search:
                                                      'Price-styles__FullPrice'
                                                      '-sc-f7c1dfcc-0 fRxqiS '
                                                      'hmFDou')
-                        price = float(price_element.text.strip('$'))
+                        price_string = price_element.text
+                        price = float(price_string[1:])
                     self.temp_list.append([price, link])
                     self.check = 1
         
@@ -183,7 +187,7 @@ class Search:
                         condition = "Used"
                 self.items_list.append(Item(name, item[0], condition, item[1]))
             
-            time.sleep(10)
+            time.sleep(5)
             driver.quit()
             return self.items_list
     
