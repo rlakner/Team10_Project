@@ -10,8 +10,10 @@ from tkinter import scrolledtext
 import pandas as pd
 from data_analysis import Analysis
 
+#Change to your path for ChromeDriver
 service = Service(executable_path=
-                          "../chromedriver.exe") #Change to your path
+                          "/Users/marcovillalta/Downloads/chromedriver-mac-"
+                          "arm64/chromedriver") 
 driver = webdriver.Chrome(service=service)
 
 class Item:
@@ -34,31 +36,52 @@ class Item:
             price(float): the price of the item
             condition(str): the condition of the item 
             link(str): the unique direct link to the item on Depop
+            score(float): a score representing how good of a deal the item is 
+                on a scale of from 0 to 3; default is 0
         """
         self.name = name
         self.price = price
         self.condition = condition
         self.link = link
+        
 class Search:
-    """A class for scraping and analyzing data for items listed on Depop"""
+    """A class for scraping and analyzing data for items listed on Depop
+    
+    Attributes:
+        query(str): The string value of the user input from the interface
+            which will be used in the url for Selenium
+        items_list(list): A list containing items found from a search
+    """
+    
     def __init__(self, query):
         """Initializes a Search with a query to find items
-        
+
         Args:
             query(str): The string value of the user input from the interface
-            which will be used in the url for Selenium
+                which will be used in the url for Selenium
+        
+        Side Effects:
+            Sets the query and items_list attributes
         """
         self.query = query
         self.items_list = []
     
     def init_scrape(self):
+        """Gets information about the item that is available from the main
+        results page (price and link)
+        
+        Returns: 
+            list: An empty list if no items are found with the given query
+            
+        Side Effects:
+            Prints "No items found. Please adjust your search." to the
+            console if the query does not yield any results
+        """
         url = f'https://www.depop.com/search/?q={self.query}'
         driver.get(url)
 
         element = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.TAG_NAME, "li"))
-        )
-        
+            EC.presence_of_element_located((By.TAG_NAME, "li")))
         time.sleep(5)
         
         x = 0
@@ -85,12 +108,12 @@ class Search:
         
         if listings is not None:
             for listing in listings:
-                #Gets the direct link to the item
+                #Get the direct link to the item
                 link = f"http://depop.com{listing.find('a', 
                         class_='styles__ProductCard-sc-4aad5806-4 ffvUlI')
                         ['href']}"
                 
-                # Gets the discounted price, if there is one
+                # Get the discounted price, if there is one
                 disc_price = listing.find('div', class_='Price-styles__Price'
                                           'WithDiscountWrapper-sc-f7c1dfcc-2')
                 if disc_price:
@@ -99,7 +122,7 @@ class Search:
                                                     'dfcc-1 fRxqiS KMEBr')
                     price_text = price_element.text.strip('$')
                     price = float(price_text)
-                # Gets the full price if the item is not on sale
+                # Get the full price if the item is not on sale
                 else:
                     price_element = listing.find('p', class_='sc-eDnWTT Price-'
                                                 'styles__FullPrice-sc-f7c1dfcc-'
@@ -117,7 +140,7 @@ class Search:
                 for listing in listings:
                     link = f"http://depop.com{listing.find('a', class_='styles_'
                     '_ProductCard-sc-4aad5806-4 ffvUlI')['href']}"
-                    # gets the price
+                    # Get the price
                     disc_price = listing.find('div', class_='Price-styles__Pric'
                                               'eWithDiscountWrapper-sc-'
                                               'f7c1dfcc-2')
@@ -137,18 +160,17 @@ class Search:
                     self.check = 1
         
     def scrape_items(self):
-        """Uses Selenium and BeautifulSoup to navigate through Depop listings
-        and scrape information regarding the name, price, condition, and link 
-        of the items
+        """Gets the condition and price for items Depop listings using Selenium 
+        and BeautifulSoup
 
         Returns: 
             items_list(list): A list of Item objects that contain the name, 
             price, condition, and link of the scraped item
         
         Side Effects:
-            - Creates new Item objects and sets their name, price, condition, 
-            and link attributes 
-            - Modifies the items_list attribute
+            Creates new Item objects and sets their name, price, condition, 
+                and link attributes 
+            Modifies the items_list attribute
         """
         
         self.init_scrape()
@@ -158,7 +180,7 @@ class Search:
         
         while self.check == 1:   
             
-        #Gets the name, price, and condition 
+        # Get the name, price, and condition 
             for item in self.temp_list:
                 driver.get(item[1])
                 item_source = driver.page_source
@@ -177,14 +199,14 @@ class Search:
                 find_condition = item_soup.find_all('p', class_='sc-eDnWTT Pro'
                                             'ductAttributes-styles__Attribute-'
                                             'sc-303d66c3-0 kcKICQ iIJjeL')[1]
-                #For items without a name, set the name to an item of the brand
+                # For items without a name, set the name to an item of the brand
                 if find_name:
                     name = find_name.text
                 else:
                     brand = find_brand.text
                     name = f"{brand} Item"
                 
-                #Gets the condition    
+                # Get the condition    
                 if find_condition:
                     condition_text = find_condition.text.lower()
                     if "new" in condition_text:
@@ -198,9 +220,8 @@ class Search:
             return self.items_list
     
 class Interface:
-    """
-    A class for a user interface for an application to help users find 
-    reasonably priced clothes by analyzing data scraped from the Depop website
+    """A class for a user interface to get a Depop search query and display
+    the results 
     
     Attributes:
         parent: a parent object that manages the interface
@@ -220,12 +241,15 @@ class Interface:
         self.window.geometry("1190x1000")
         self.window.title("Depop Deal Finder")
         self.window.protocol("WM_DELETE_WINDOW", self.parent.quit)
+        
+        # Create the box for user input
         self.entry_label = tk.Label(self.window, 
                                     text="What are you searching for?")
         self.entry_label.place(x=495, y=50)
         self.entry = tk.Entry(self.window)
         self.entry.place(x=495, y=70)
         
+        # Create the button to start the rest of the program
         self.button = tk.Button(self.window, text="Start Finding Deals", 
                                 command=self.popupmsg)
         self.button.place(x=515, y=100)
@@ -237,6 +261,7 @@ class Interface:
             Modifies the query attribute 
             Creates instances of Search and Analysis 
         """
+        # Get the users search query 
         self.query = self.entry.get()
         if self.query:
             if " " in self.query:
@@ -244,10 +269,12 @@ class Interface:
             scraper = Search(self.query)
             items = scraper.scrape_items()
         
+        # Prompt the user to try again if no results were found
         if not items:
             message = "We did not find any results. Please try another search."
             label = tk.Label(self.window, text=message)
             label.place(x=438, y=430)       
+        # Display the sorted results if any were found
         else: 
             message = (f"Happy Shopping!")
             label = tk.Label(self.window, text=message)
@@ -267,6 +294,7 @@ class Interface:
             Creates and displays the dataframe of deals within the pop up 
         """
         items_info = []
+        # Format all of the information for the sorted items
         for item in sorted_items:
             item_info = {
                 "Product Name": item.name,
@@ -276,8 +304,10 @@ class Interface:
                 "Our Score (0-3)": item.score
             }
             items_info.append(item_info)
+            
         products = pd.DataFrame(items_info)
         pd.set_option('display.colheader_justify', 'center')
+        # Add the formatted dataframe to the pop up window 
         products_text = scrolledtext.ScrolledText(self.window, width=165,
                                                   height=40)
         products_text.place(x=5, y=150)
