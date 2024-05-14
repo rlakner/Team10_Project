@@ -1,19 +1,19 @@
     
 class Analysis:
     def averages(self, items):
-        """Calculates the average price of an item in different conditions
+        """Calculates the average price of items in different conditions
 
         Args:
-            items(list): The list of Items returned by scrape_items which 
-                will then be parsed
+            items(list): The list of Items scraped from Depop
         
         Returns:
             item_averages(tuple): a tuple containing the calculated average 
                 price for the item in new condition, used condition, and for all 
-                listed items from a search, regardless of condition
+                listed items from a search (regardless of condition)
         """
         new_prices = []
         used_prices = []
+        
         for item in items:
             if item.condition == "New":
                 new_prices.append(item.price)
@@ -60,17 +60,13 @@ class Analysis:
         """Gives an item an overall score based on its price and condition
         
         Args: 
-            items(list): The list of Items returned by scrape_items which 
-                will then be parsed
+            items(list): The list of Items scraped from Depop
 
-        Returns: None
-        
         Side Effects:
             Modifies the score attribute of an item
         """
-        # gets the average price for the item in new condition, used 
-        # condition, and for all listed items from a search
         new_avg, used_avg, entire_avg = self.averages(items)
+        
         for item in items:
             if item.condition == "New":
                 item.score = self.score_price(item.price, new_avg)
@@ -78,8 +74,8 @@ class Analysis:
             else:
                 item.score = self.score_price(item.price, used_avg)
                 item.score += 0.5
-            # provides a higher score if the item is also below the average price
-            # from the entire search
+            # provides a higher score if the item is also below the average 
+            # price from the entire search
             item.score += self.score_price(item.price, entire_avg)
         
         return items
@@ -89,29 +85,12 @@ class Analysis:
 
         Args:
             scored_items(list): The list of Items from the search with their 
-            assigned 
-            scores 
+            assigned scores 
 
         Returns:
             deals(list): a list of the same items but ordered from best to 
             worst deal according to our criteria 
         """
-        # assign a score to each item from a search
         deals_list = sorted(scored_items, key= lambda item: (-item.score, 
                             item.price))
         return deals_list
-    
-    def sort_by_price(self, items, ascending):
-        """"Sorts items from a search either in ascending or descending order
-
-        Args:
-            items(list): The list of Items from the search with their assigned 
-            scores  
-            ascending(boolean): the desired search condition where True sorts 
-            items in ascending order and False sorts items in descending order
-
-        Returns:
-            sorted_items(list): a list of Items sorted in the desired order
-        """
-        sorted_items = sorted(items, key=lambda x: x['price'], reverse=not ascending)
-        return sorted_items
