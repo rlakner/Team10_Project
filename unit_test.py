@@ -75,6 +75,24 @@ class TestDepopDealFinder(unittest.TestCase):
 
         # Assert that the display_deals method was called with sorted items
         mock_scrolledtext.return_value.insert.assert_called_once()
+    
+    
+    def setUp(self):
+        self.search = Search("shoes")
+        self.search.driver = Mock()
+        self.search.driver.page_source = "<html><body><div class='item'><a href='https://example.com/shoes'>Shoes</a></div></body></html>"
+
+    def test_scrape_items(self):
+        items_list = self.search.scrape_items()
+        
+        # Assert that items_list contains the expected Item object
+        self.assertEqual(len(items_list), 1)
+        self.assertIsInstance(items_list[0], Item)
+        self.assertEqual(items_list[0].name, "Shoes")
+        self.assertEqual(items_list[0].price, None)  # Assuming price is not set in this test case
+        self.assertEqual(items_list[0].condition, "Used")  # Assuming condition is set correctly in the scrape_items method
+        self.assertEqual(items_list[0].link, "https://example.com/shoes")
+    
         
     def setUp(self):
         self.root = Tk()
