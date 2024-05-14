@@ -48,7 +48,10 @@ line of code will say: service = Service() and #Change your path
 
 OPTIONAL STEP - CHANGE SCROLL LENGTH
 - For efficiency and demo purposes, we set the scrolling threshold to 50, 
-meaning that the driver scrolls down on Depop 50 times.
+this is a representation of the time the web driver will scroll for. We 
+approximate every increment of 50 to be a single scroll (i.e. 50 = 1 scroll,
+100 = 2 scrolls, etc). The longer you scroll for the more listings that will be
+analyzed and put into the interface.
 - If you would like to change this threshold, please change the integer value on 
 line 91 marked by a comment that says "Change this to make it scroll for longer"
 
