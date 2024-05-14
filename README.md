@@ -1,5 +1,5 @@
 # Team10_Project
-INST326 Final Project - Depop Deal Finder - Documenation
+INST326 Final Project - Depop Deal Finder - Project Documenation
 
 Thank you for using our Depop Deal Finder program! We created this program
 to help Depop users with the time consuming and exhausting process of analyzing
