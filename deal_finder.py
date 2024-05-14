@@ -2,6 +2,8 @@ from bs4 import BeautifulSoup as bs
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import time
 import tkinter as tk
 from tkinter import scrolledtext
@@ -9,7 +11,7 @@ import pandas as pd
 from data_analysis import Analysis
 
 service = Service(executable_path=
-                          "/usr/local/bin/chromedriver") #Change to your path
+                          "../chromedriver.exe") #Change to your path
 driver = webdriver.Chrome(service=service)
 
 class Item:
@@ -53,7 +55,11 @@ class Search:
         url = f'https://www.depop.com/search/?q={self.query}'
         driver.get(url)
 
-        time.sleep(2)
+        element = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.TAG_NAME, "li"))
+        )
+        
+        time.sleep(5)
         
         x = 0
         while True:
