@@ -180,7 +180,7 @@ class Search:
         
         while self.check == 1:   
             
-        # Get the name, price, and condition 
+        # Get the name and condition 
             for item in self.temp_list:
                 driver.get(item[1])
                 item_source = driver.page_source
