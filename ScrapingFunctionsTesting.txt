@@ -1,15 +1,17 @@
-Since the scrape_items function cannot be automatically tested, here is a 
-testing procedure to determine if it is successful.
+Since the init_scrape and scrape_items functions cannot be automatically 
+tested, here is a testing procedure to determine if it is successful.
 
 - Open the Depop website https://www.depop.com/ 
 - Search for any item using their search feature
 - Look at the search results (if there are any)
-- Open the Python script that has the DepopScraper class and call the 
-    scrape_items function with the search term you used on the website as the
-    required argument 
-- Verify that the function returns a list of Item objects 
+- Open the deal_finder script that has the Search class 
+= Run the code by calling deal_finder.py in the terminal and enter the same 
+exact search you used on the website 
+- Verify that the function returns a table of Item objects 
 - Compare the name, price, condition, and link attributes of the Item 
-    objects in the returned list with the corresponding results displayed
-    by the Depop website 
-- Test a search where no results are found and ensure that the scrape_items
-    function raises the appropriate error 
+objects in the returned list with the corresponding results displayed
+by the Depop website 
+- Test a search where no results are found and ensure that this is communicated;
+this will print "No items found. Please adjust your search." in the terminal and
+"We did not find any results. Please try another search." in the pop up window.
+
