@@ -1,5 +1,5 @@
 import deal_finder as df
-from deal_finder import Item
+from deal_finder import Item, Search
 from data_analysis import Analysis
 from math import isclose
 
@@ -25,6 +25,19 @@ items = [
              link = "https://www.depop.com/products/lickhere-carhartt-insulated"
              "-zip-up-hooded/")
     ]
+
+def test_scrape_items():
+    """A test case to check that the scrape_items function returns a list
+    """
+    search1 = "carhartt jacket"
+    tester1 = Search(search1)
+    result1 = tester1.scrape_items()
+    
+    search2 = "eorgnwionwei"
+    tester2 = Search(search2)
+    result2 = tester2.scrape_items()
+    assert isinstance(result1, list)
+    assert isinstance(result2, list) and len(result2) == 0
 
 def test_averages():
     """A test case to check that the averages function returns the correct values
