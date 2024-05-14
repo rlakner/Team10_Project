@@ -46,6 +46,12 @@ STEP 3 -  UPDATE PATH IN CODE
 line of code will say: service = Service() and #Change your path
 - Change the value of the executable_path by pasting the path from step 2
 
+OPTIONAL STEP - CHANGE SCROLL LENGTH
+- For efficiency and demo purposes, we set the scrolling threshold to 50, 
+meaning that the driver scrolls down on Depop 50 times.
+- If you would like to change this threshold, please change the integer value on 
+line 91 marked by a comment that says "Change this to make it scroll for longer"
+
 STEP 4 - USE THE PROGRAM
 - To run the program from the command line, ensure that you have the 
 data_analysis.py file as well. Then, type in python3 deal_finder.py (Mac) or 
